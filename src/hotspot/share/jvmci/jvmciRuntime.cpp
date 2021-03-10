@@ -43,6 +43,10 @@
 #if INCLUDE_G1GC
 #include "gc/g1/g1ThreadLocalData.hpp"
 #endif // INCLUDE_G1GC
+#if INCLUDE_SHENANDOAHGC
+#include "gc/shenandoah/shenandoahThreadLocalData.hpp"
+#include "gc/shenandoah/shenandoahRuntime.hpp"
+#endif // INCLUDE_G1GC
 
 // Simple helper to see if the caller of a runtime stub which
 // entered the VM has been deoptimized
@@ -589,6 +593,18 @@ JRT_LEAF(void, JVMCIRuntime::write_barrier_post(JavaThread* thread, void* card_a
 JRT_END
 
 #endif // INCLUDE_G1GC
+
+#if INCLUDE_SHENANDOAHGC
+
+JRT_LEAF(void, JVMCIRuntime::shenandoah_concmark_barrier(JavaThread* thread, oopDesc* obj))
+  ShenandoahThreadLocalData::satb_mark_queue(thread).enqueue(obj);
+JRT_END
+
+JRT_LEAF(oopDesc*, JVMCIRuntime::shenandoah_load_reference_barrier(JavaThread* thread, oopDesc* obj))
+  return ShenandoahRuntime::load_reference_barrier_jvmci(thread, obj);
+JRT_END
+
+#endif // INCLUDE_SHENANDOAHGC
 
 JRT_LEAF(jboolean, JVMCIRuntime::validate_object(JavaThread* thread, oopDesc* parent, oopDesc* child))
   bool ret = true;

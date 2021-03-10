@@ -64,3 +64,7 @@ JRT_LEAF(void, ShenandoahRuntime::shenandoah_clone_barrier(oopDesc* src))
   shenandoah_assert_correct(NULL, s);
   ShenandoahBarrierSet::barrier_set()->clone_barrier(s);
 JRT_END
+
+JRT_LEAF(oopDesc*, ShenandoahRuntime::load_reference_barrier_jvmci(JavaThread* thread, oopDesc* obj))
+  return (oopDesc*) ShenandoahBarrierSet::barrier_set()->load_reference_barrier(oop(obj));
+JRT_END
